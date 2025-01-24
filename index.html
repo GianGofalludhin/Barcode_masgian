@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARCODE MAS GIAN</title>
+    <link rel="icon" type="image/png" href="images/op.PNG">
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #inputForm {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            color: #666;
+            font-weight: bold;
+        }
+
+        input[type="file"], 
+        input[type="url"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #barcodeCanvas, #qrcodeCanvas {
+            display: block;
+            margin: 20px auto;
+            max-width: 100%;
+        }
+
+        .code-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .save-button {
+            display: block;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BARCODE MAS GIAN</h1>
+        <form id="inputForm">
+            <label for="fileInput">Pilih Gambar atau PDF:</label>
+            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.pdf">
+            
+            <label for="linkInput">Masukkan Link (Opsional):</label>
+            <input type="url" id="linkInput" placeholder="https://contoh.com">
+            
+            <button type="button" onclick="generateBarcode()">Buat Barcode & QR Code</button>
+        </form>
+
+        <div class="code-section">
+            <h3>Barcode:</h3>
+            <canvas id="barcodeCanvas"></canvas>
+            <button class="save-button" onclick="saveImage('barcodeCanvas', 'barcode.png')">Simpan Barcode</button>
+        </div>
+
+        <div class="code-section">
+            <h3>QR Code:</h3>
+            <canvas id="qrcodeCanvas"></canvas>
+            <button class="save-button" onclick="saveImage('qrcodeCanvas', 'qrcode.png')">Simpan QR Code</button>
+        </div>
+    </div>
+
+    <script>
+        function generateBarcode() {
+            const fileInput = document.getElementById('fileInput');
+            const linkInput = document.getElementById('linkInput').value.trim();
+            const file = fileInput.files[0];
+            if (!file && !linkInput) {
+                alert("Pilih file atau masukkan link terlebih dahulu!");
+                return;
+            }
+            let data;
+            if (file) {
+                data = file.name;
+            } else if (linkInput) {
+                data = linkInput;
+            }
+            // Generate barcode
+            const barcodeCanvas = document.getElementById('barcodeCanvas');
+            JsBarcode(barcodeCanvas, data, {
+                format: "CODE128",
+                lineColor: "#000",
+                width: 2,
+                height: 50,
+                displayValue: true
+            });
+            // Generate QR Code
+            const qrcodeCanvas = document.getElementById('qrcodeCanvas');
+            const qrCode = new QRCode(document.createElement('div'), {
+                text: data,
+                width: 128,
+                height: 128
+            });
+            // Convert QR Code to canvas
+            const qrCodeImg = qrCode._el.firstChild;
+            const qrCtx = qrcodeCanvas.getContext('2d');
+            qrCtx.clearRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height);
+            qrcodeCanvas.width = 128;
+            qrcodeCanvas.height = 128;
+            qrCtx.drawImage(qrCodeImg, 0, 0);
+        }
+        function saveImage(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = filename;
+            link.click();
+        }
+    </script>
+</body>
+</html>
