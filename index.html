@@ -5,161 +5,277 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BARCODE MAS GIAN</title>
     <link rel="icon" type="image/png" href="images/op.PNG">
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
+            background-color: white;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
+            min-height: 100vh;
             padding: 20px;
             margin: 0;
-            min-height: 100vh;
+            overflow: hidden;
         }
-
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(106, 13, 173, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .loader {
+            display: flex;
+            gap: 15px;
+        }
+        .loader div {
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            animation: bounce 0.5s alternate infinite;
+        }
+        .loader div:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        .loader div:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        @keyframes bounce {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(-20px);
+            }
+        }
         .container {
             background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 600px;
-        }
-
-        h1 {
-            color: #333;
+            max-width: 500px;
+            padding: 30px;
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 2rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
         }
-
-        #inputForm {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        h1 {
+            font-family: 'Indie Flower', cursive;
+            font-size: 2.5rem;
             margin-bottom: 20px;
+            color: #6a0dad;
+            text-shadow: 2px 2px 4px rgba(106, 13, 173, 0.5);
         }
-
-        label {
-            color: #666;
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #6a0dad;
             font-weight: bold;
         }
-
-        input[type="file"], 
-        input[type="url"] {
+        .input-group input {
+            width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            width: 100%;
-            box-sizing: border-box;
         }
-
-        button {
-            background-color: #007bff;
+        .btn {
+            background-color: #6a0dad;
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-top: 10px;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px auto;
         }
-
-        button:hover {
-            background-color: #0056b3;
+        .btn:hover {
+            background-color: #4b0082;
         }
-
-        #barcodeCanvas, #qrcodeCanvas {
-            display: block;
-            margin: 20px auto;
+        .code-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .code-section {
+            flex: 1;
+            background-color: #f4f4f4;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        #barcodeCanvas {
             max-width: 100%;
         }
-
-        .code-section {
-            text-align: center;
-            margin-bottom: 20px;
+        .qrcode {
+            display: flex;
+            justify-content: center;
         }
-
-        .save-button {
-            display: block;
-            margin: 10px auto;
+        .save-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .save-btn {
+            background-color: #4CAF50;
+            margin-top: 10px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .save-btn:hover {
+            background-color: #388E3C;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .btn {
+                padding: 8px 16px;
+            }
+            .code-container {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>BARCODE MAS GIAN</h1>
-        <form id="inputForm">
-            <label for="fileInput">Pilih Gambar atau PDF:</label>
-            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.pdf">
-            
-            <label for="linkInput">Masukkan Link (Opsional):</label>
-            <input type="url" id="linkInput" placeholder="https://giandansopi.com">
-            
-            <button type="button" onclick="generateBarcode()">Buat Barcode & QR Code</button>
-        </form>
-
-        <div class="code-section">
-            <h3>Barcode:</h3>
-            <canvas id="barcodeCanvas"></canvas>
-            <button class="save-button" onclick="saveImage('barcodeCanvas', 'barcode.png')">Simpan Barcode</button>
-        </div>
-
-        <div class="code-section">
-            <h3>QR Code:</h3>
-            <canvas id="qrcodeCanvas"></canvas>
-            <button class="save-button" onclick="saveImage('qrcodeCanvas', 'qrcode.png')">Simpan QR Code</button>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="loader">
+            <div></div>
+            <div></div>
+            <div></div>
         </div>
     </div>
 
+    <div class="container">
+        <h1>BARCODE MAS GIAN</h1>
+        
+        <div class="input-group">
+            <label for="fileInput">Pilih File (Gambar/PDF):</label>
+            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.pdf">
+        </div>
+
+        <div class="input-group">
+            <label for="linkInput">Masukkan Link (Opsional):</label>
+            <input type="url" id="linkInput" placeholder="https://giandansopi.com">
+        </div>
+
+        <button class="btn" onclick="generateCodes()">
+            <i class="fas fa-qrcode"></i> Generate Kode
+        </button>
+
+        <div class="code-container">
+            <div class="code-section">
+                <h3>Barcode</h3>
+                <canvas id="barcodeCanvas"></canvas>
+            </div>
+            <div class="code-section">
+                <h3>QR Code</h3>
+                <div id="qrcodeCanvas" class="qrcode"></div>
+            </div>
+        </div>
+
+        <div class="save-buttons">
+            <button class="save-btn" onclick="saveImage('barcodeCanvas', 'barcode.png')">
+                <i class="fas fa-save"></i> Simpan Barcode
+            </button>
+            <button class="save-btn" onclick="saveQRCode()">
+                <i class="fas fa-save"></i> Simpan QR Code
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
-        function generateBarcode() {
+        // Remove loading overlay after page fully loads
+        window.addEventListener('load', function() {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            setTimeout(() => {
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 500);
+            }, 1500); // Reduced to 1.5 seconds
+        });
+        
+
+        function generateCodes() {
             const fileInput = document.getElementById('fileInput');
-            const linkInput = document.getElementById('linkInput').value.trim();
+            const linkInput = document.getElementById('linkInput');
+            
             const file = fileInput.files[0];
-            if (!file && !linkInput) {
-                alert("Pilih file atau masukkan link terlebih dahulu!");
+            const link = linkInput.value.trim();
+
+            if (!file && !link) {
+                alert('Masukkan file atau link terlebih dahulu!');
                 return;
             }
-            let data;
-            if (file) {
-                data = file.name;
-            } else if (linkInput) {
-                data = linkInput;
-            }
-            // Generate barcode
+
+            const data = file ? file.name : link;
+
+            // Generate Barcode
             const barcodeCanvas = document.getElementById('barcodeCanvas');
             JsBarcode(barcodeCanvas, data, {
                 format: "CODE128",
-                lineColor: "#000",
                 width: 2,
-                height: 50,
+                height: 100,
                 displayValue: true
             });
+
             // Generate QR Code
             const qrcodeCanvas = document.getElementById('qrcodeCanvas');
-            const qrCode = new QRCode(document.createElement('div'), {
+            qrcodeCanvas.innerHTML = ''; // Clear previous QR code
+            new QRCode(qrcodeCanvas, {
                 text: data,
                 width: 128,
-                height: 128
+                height: 128,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
             });
-            // Convert QR Code to canvas
-            const qrCodeImg = qrCode._el.firstChild;
-            const qrCtx = qrcodeCanvas.getContext('2d');
-            qrCtx.clearRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height);
-            qrcodeCanvas.width = 128;
-            qrcodeCanvas.height = 128;
-            qrCtx.drawImage(qrCodeImg, 0, 0);
         }
+
         function saveImage(canvasId, filename) {
             const canvas = document.getElementById(canvasId);
             const link = document.createElement('a');
-            link.href = canvas.toDataURL('image/png');
             link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function saveQRCode() {
+            const qrCanvas = document.querySelector('#qrcodeCanvas canvas');
+            const link = document.createElement('a');
+            link.download = 'qrcode.png';
+            link.href = qrCanvas.toDataURL('image/png');
             link.click();
         }
     </script>
