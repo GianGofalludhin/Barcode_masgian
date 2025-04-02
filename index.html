@@ -1,285 +1,493 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BARCODE MAS GIAN</title>
-    <link rel="icon" type="image/png" href="images/op.PNG">
-    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Generator QR Code & Barcode</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            background-color: #f5f5f5;
+            color: #333;
             padding: 20px;
-            margin: 0;
-            overflow-x: hidden;
+            max-width: 100%;
         }
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(106, 13, 173, 0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 1;
-            transition: opacity 0.5s ease-in-out;
-        }
-        .loader {
-            display: flex;
-            gap: 15px;
-        }
-        .loader div {
-            width: 20px;
-            height: 20px;
-            background-color: white;
-            border-radius: 50%;
-            animation: bounce 0.5s alternate infinite;
-        }
-        .loader div:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-        .loader div:nth-child(3) {
-            animation-delay: 0.2s;
-        }
-        @keyframes bounce {
-            from {
-                transform: translateY(0);
-            }
-            to {
-                transform: translateY(-20px);
-            }
-        }
+        
         .container {
             background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            width: 100%;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
             max-width: 500px;
-            padding: 30px;
-            text-align: center;
         }
+        
         h1 {
-            font-family: 'Indie Flower', cursive;
-            font-size: 2.5rem;
+            text-align: center;
             margin-bottom: 20px;
-            color: #6a0dad;
-            text-shadow: 2px 2px 4px rgba(106, 13, 173, 0.5);
+            color: #2c3e50;
         }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            background-color: #f8f8f8;
+            border-radius: 5px 5px 0 0;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+        }
+        
         .input-group {
             margin-bottom: 15px;
         }
-        .input-group label {
+        
+        label {
             display: block;
             margin-bottom: 5px;
-            color: #6a0dad;
             font-weight: bold;
         }
-        .input-group input {
+        
+        input[type="text"], input[type="url"], select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 5px;
         }
-        .btn {
-            background-color: #6a0dad;
+        
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+        
+        button {
+            background-color: #3498db;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 12px 20px;
             cursor: pointer;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 16px;
             transition: background-color 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin: 10px auto;
         }
-        .btn:hover {
-            background-color: #4b0082;
+        
+        button:hover {
+            background-color: #2980b9;
         }
-        .code-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 20px;
+        
+        .result {
             margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        .code-section {
-            flex: 1;
-            min-width: 200px;
-            background-color: #f4f4f4;
-            border-radius: 10px;
-            padding: 15px;
             text-align: center;
         }
-        #barcodeCanvas {
+        
+        .result img {
             max-width: 100%;
+            margin-bottom: 10px;
         }
-        .qrcode {
-            display: flex;
-            justify-content: center;
-        }
-        .save-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .save-btn {
-            background-color: #4CAF50;
+        
+        .download-btn {
+            background-color: #2ecc71;
             margin-top: 10px;
-            padding: 10px 20px;
+        }
+        
+        .download-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .error {
+            color: #e74c3c;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .preview-image {
+            max-width: 100px;
+            max-height: 100px;
+            display: block;
+            margin: 10px 0;
+        }
+        
+        .options {
+            margin-top: 15px;
+        }
+        
+        .drag-area {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
             border-radius: 5px;
+            margin-bottom: 15px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
-        .save-btn:hover {
-            background-color: #388E3C;
-        }
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-            h1 {
-                font-size: 2rem;
-            }
-            .btn {
-                padding: 8px 16px;
-            }
-            .code-container {
-                flex-direction: column;
-                gap: 15px;
-            }
+        
+        .drag-area.active {
+            border-color: #3498db;
         }
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div id="loading-overlay">
-        <div class="loader">
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-    </div>
-
     <div class="container">
-        <h1>BARCODE MAS GIAN</h1>
-
-        <div class="input-group">
-            <label for="fileInput">Pilih File (Gambar/PDF):</label>
-            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.pdf">
+        <h1>Generator QR Code & Barcode</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="qrcode">QR Code</div>
+            <div class="tab" data-tab="barcode">Barcode</div>
         </div>
-
-        <div class="input-group">
-            <label for="linkInput">Masukkan Link (Opsional):</label>
-            <input type="url" id="linkInput" placeholder="https://giandansopi.com">
-        </div>
-
-        <button class="btn" onclick="generateCodes()">
-            <i class="fas fa-qrcode"></i> Generate Kode
-        </button>
-
-        <div class="code-container">
-            <div class="code-section">
-                <h3>Barcode</h3>
-                <canvas id="barcodeCanvas"></canvas>
+        
+        <div id="qrcode-content" class="tab-content">
+            <div class="input-group">
+                <label for="qr-input-type">Tipe Input:</label>
+                <select id="qr-input-type">
+                    <option value="text">Teks/URL</option>
+                    <option value="image">Gambar</option>
+                </select>
             </div>
-            <div class="code-section">
-                <h3>QR Code</h3>
-                <div id="qrcodeCanvas" class="qrcode"></div>
+            
+            <div id="qr-text-input">
+                <div class="input-group">
+                    <label for="qr-text">Masukkan Teks atau URL:</label>
+                    <input type="text" id="qr-text" placeholder="https://contoh.com atau teks lainnya">
+                </div>
+            </div>
+            
+            <div id="qr-image-input" style="display: none;">
+                <div class="drag-area">
+                    <p>Tarik & Letakkan Gambar di sini atau klik untuk memilih</p>
+                    <input type="file" id="qr-image-file" accept="image/*" style="display: none;">
+                </div>
+                <div id="image-preview"></div>
+            </div>
+            
+            <div class="options">
+                <div class="input-group">
+                    <label for="qr-color">Warna QR Code:</label>
+                    <input type="color" id="qr-color" value="#000000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="qr-size">Ukuran QR Code:</label>
+                    <select id="qr-size">
+                        <option value="100">Kecil (100x100)</option>
+                        <option value="200" selected>Sedang (200x200)</option>
+                        <option value="300">Besar (300x300)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button id="generate-qr">Buat QR Code</button>
+            
+            <div id="qr-result" class="result" style="display: none;">
+                <img id="qr-image" src="" alt="QR Code">
+                <button id="download-qr" class="download-btn">Unduh QR Code</button>
             </div>
         </div>
-
-        <div class="save-buttons">
-            <button class="save-btn" onclick="saveImage('barcodeCanvas', 'barcode.png')">
-                <i class="fas fa-save"></i> Simpan Barcode
-            </button>
-            <button class="save-btn" onclick="saveQRCode()">
-                <i class="fas fa-save"></i> Simpan QR Code
-            </button>
+        
+        <div id="barcode-content" class="tab-content" style="display: none;">
+            <div class="input-group">
+                <label for="barcode-text">Masukkan Teks untuk Barcode:</label>
+                <input type="text" id="barcode-text" placeholder="1234567890">
+            </div>
+            
+            <div class="options">
+                <div class="input-group">
+                    <label for="barcode-format">Format Barcode:</label>
+                    <select id="barcode-format">
+                        <option value="CODE128">CODE128 (Teks & Angka)</option>
+                        <option value="EAN13">EAN-13 (13 Digit Numerik)</option>
+                        <option value="CODE39">CODE39 (Karakter Alfanumerik)</option>
+                        <option value="UPC">UPC (12 Digit Numerik)</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="barcode-width">Lebar Barcode:</label>
+                    <select id="barcode-width">
+                        <option value="1">Tipis</option>
+                        <option value="2" selected>Sedang</option>
+                        <option value="3">Tebal</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="barcode-height">Tinggi Barcode:</label>
+                    <select id="barcode-height">
+                        <option value="50">Pendek (50px)</option>
+                        <option value="100" selected>Sedang (100px)</option>
+                        <option value="150">Tinggi (150px)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button id="generate-barcode">Buat Barcode</button>
+            
+            <div id="barcode-result" class="result" style="display: none;">
+                <svg id="barcode-svg"></svg>
+                <button id="download-barcode" class="download-btn">Unduh Barcode</button>
+            </div>
         </div>
+        
+        <div id="error-message" class="error"></div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
+    
     <script>
-        // Remove loading overlay after page fully loads
-        window.addEventListener('load', function() {
-            const loadingOverlay = document.getElementById('loading-overlay');
-            setTimeout(() => {
-                loadingOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    loadingOverlay.style.display = 'none';
-                }, 500);
-            }, 1500); // Reduced to 1.5 seconds
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show relevant content
+                tabContents.forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                document.getElementById(`${tabName}-content`).style.display = 'block';
+            });
         });
-
-        function generateCodes() {
-            const fileInput = document.getElementById('fileInput');
-            const linkInput = document.getElementById('linkInput');
-
+        
+        // QR Code input type switching
+        const qrInputType = document.getElementById('qr-input-type');
+        const qrTextInput = document.getElementById('qr-text-input');
+        const qrImageInput = document.getElementById('qr-image-input');
+        
+        qrInputType.addEventListener('change', () => {
+            if (qrInputType.value === 'text') {
+                qrTextInput.style.display = 'block';
+                qrImageInput.style.display = 'none';
+            } else {
+                qrTextInput.style.display = 'none';
+                qrImageInput.style.display = 'block';
+            }
+        });
+        
+        // Drag and drop functionality
+        const dragArea = document.querySelector('.drag-area');
+        const fileInput = document.getElementById('qr-image-file');
+        
+        dragArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        dragArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dragArea.classList.add('active');
+        });
+        
+        dragArea.addEventListener('dragleave', () => {
+            dragArea.classList.remove('active');
+        });
+        
+        dragArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragArea.classList.remove('active');
+            
+            const file = e.dataTransfer.files[0];
+            handleImageFile(file);
+        });
+        
+        fileInput.addEventListener('change', () => {
             const file = fileInput.files[0];
-            const link = linkInput.value.trim();
-
-            if (!file && !link) {
-                alert('Masukkan file atau link terlebih dahulu!');
+            handleImageFile(file);
+        });
+        
+        let selectedImage = null;
+        
+        function handleImageFile(file) {
+            if (file && file.type.startsWith('image/')) {
+                selectedImage = file;
+                const reader = new FileReader();
+                
+                reader.onload = (e) => {
+                    const imagePreview = document.getElementById('image-preview');
+                    imagePreview.innerHTML = `<img src="${e.target.result}" class="preview-image">`;
+                };
+                
+                reader.readAsDataURL(file);
+            } else {
+                showError('Silakan pilih file gambar yang valid.');
+            }
+        }
+        
+        // Generate QR Code
+        const generateQrBtn = document.getElementById('generate-qr');
+        const qrResult = document.getElementById('qr-result');
+        const qrImage = document.getElementById('qr-image');
+        
+        generateQrBtn.addEventListener('click', () => {
+            const inputType = qrInputType.value;
+            const qrSize = parseInt(document.getElementById('qr-size').value);
+            const qrColor = document.getElementById('qr-color').value;
+            let qrText = '';
+            
+            if (inputType === 'text') {
+                qrText = document.getElementById('qr-text').value.trim();
+                
+                if (!qrText) {
+                    showError('Silakan masukkan teks atau URL terlebih dahulu.');
+                    return;
+                }
+            } else {
+                if (!selectedImage) {
+                    showError('Silakan pilih gambar terlebih dahulu.');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    // Use the data URL of the image as QR code content
+                    generateQRCode(e.target.result, qrSize, qrColor);
+                };
+                reader.readAsDataURL(selectedImage);
                 return;
             }
-
-            const data = file ? file.name : link;
-
-            // Generate Barcode
-            const barcodeCanvas = document.getElementById('barcodeCanvas');
-            JsBarcode(barcodeCanvas, data, {
-                format: "CODE128",
-                width: 2,
-                height: 100,
-                displayValue: true
-            });
-
-            // Generate QR Code
-            const qrcodeCanvas = document.getElementById('qrcodeCanvas');
-            qrcodeCanvas.innerHTML = ''; // Clear previous QR code
-            new QRCode(qrcodeCanvas, {
-                text: data,
-                width: 128,
-                height: 128,
-                colorDark: "#000000",
+            
+            generateQRCode(qrText, qrSize, qrColor);
+        });
+        
+        function generateQRCode(text, size, color) {
+            // Clear previous QR code
+            document.getElementById('qr-result').innerHTML = '';
+            
+            // Create QR code div
+            const qrDiv = document.createElement('div');
+            qrDiv.id = 'qrcode';
+            document.getElementById('qr-result').appendChild(qrDiv);
+            
+            // Generate new QR code
+            new QRCode(qrDiv, {
+                text: text,
+                width: size,
+                height: size,
+                colorDark: color,
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
             });
+            
+            // Add download button
+            const downloadBtn = document.createElement('button');
+            downloadBtn.textContent = 'Unduh QR Code';
+            downloadBtn.className = 'download-btn';
+            downloadBtn.addEventListener('click', () => {
+                // Get the canvas from the QR code div
+                const canvas = qrDiv.querySelector('canvas');
+                
+                // Convert canvas to data URL
+                const dataURL = canvas.toDataURL('image/png');
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'qrcode.png';
+                link.href = dataURL;
+                link.click();
+            });
+            
+            document.getElementById('qr-result').appendChild(downloadBtn);
+            document.getElementById('qr-result').style.display = 'block';
+            hideError();
         }
-
-        function saveImage(canvasId, filename) {
-            const canvas = document.getElementById(canvasId);
-            const link = document.createElement('a');
-            link.download = filename;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+        
+        // Generate Barcode
+        const generateBarcodeBtn = document.getElementById('generate-barcode');
+        const barcodeResult = document.getElementById('barcode-result');
+        const barcodeSvg = document.getElementById('barcode-svg');
+        
+        generateBarcodeBtn.addEventListener('click', () => {
+            const barcodeText = document.getElementById('barcode-text').value.trim();
+            const barcodeFormat = document.getElementById('barcode-format').value;
+            const barcodeWidth = parseInt(document.getElementById('barcode-width').value);
+            const barcodeHeight = parseInt(document.getElementById('barcode-height').value);
+            
+            if (!barcodeText) {
+                showError('Silakan masukkan teks untuk barcode terlebih dahulu.');
+                return;
+            }
+            
+            try {
+                // Generate barcode
+                JsBarcode("#barcode-svg", barcodeText, {
+                    format: barcodeFormat,
+                    width: barcodeWidth,
+                    height: barcodeHeight,
+                    displayValue: true
+                });
+                
+                // Show result and download button
+                barcodeResult.style.display = 'block';
+                
+                // Add download functionality to the button
+                document.getElementById('download-barcode').onclick = function() {
+                    // Get SVG data
+                    const svgData = new XMLSerializer().serializeToString(barcodeSvg);
+                    
+                    // Create canvas
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Create image
+                    const img = new Image();
+                    img.onload = function() {
+                        // Set canvas dimensions
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        
+                        // Draw image on canvas
+                        ctx.drawImage(img, 0, 0);
+                        
+                        // Download image
+                        const link = document.createElement('a');
+                        link.download = 'barcode.png';
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                    };
+                    
+                    // Load image with SVG data
+                    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+                };
+                
+                hideError();
+            } catch (e) {
+                showError('Gagal membuat barcode. Pastikan format dan teks sudah benar.');
+                console.error(e);
+            }
+        });
+        
+        // Error handling
+        function showError(message) {
+            const errorElement = document.getElementById('error-message');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
         }
-
-        function saveQRCode() {
-            const qrCanvas = document.querySelector('#qrcodeCanvas canvas');
-            const link = document.createElement('a');
-            link.download = 'qrcode.png';
-            link.href = qrCanvas.toDataURL('image/png');
-            link.click();
+        
+        function hideError() {
+            document.getElementById('error-message').style.display = 'none';
         }
     </script>
 </body>
